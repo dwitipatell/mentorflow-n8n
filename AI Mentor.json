@@ -1,0 +1,147 @@
+{
+  "name": "AI Mentor",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "🎯 Your Skill Mastery Blueprint",
+        "formDescription": "Tell us one skill you want to conquer - tech or non-tech - and your AI mentor will email you a complete mastery roadmap.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Your Name "
+            },
+            {
+              "fieldLabel": "Your Email",
+              "fieldType": "email"
+            },
+            {
+              "fieldLabel": "Which skill do you want to master?",
+              "fieldType": "textarea"
+            },
+            {
+              "fieldLabel": "Where are you and how much time can you dedicate ?",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Beginner - 2 hrs/day"
+                  },
+                  {
+                    "option": "Intermediate - 3 to 4 hrs/day"
+                  },
+                  {
+                    "option": "Dedicated - 6 hrs/day"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -288,
+        0
+      ],
+      "id": "38049b0b-7180-409d-aac8-d1eb7d0a0276",
+      "name": "On form submission",
+      "webhookId": "9991f986-4616-4f58-b1c5-bf252b1aedd0"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-3.1-flash-lite",
+          "mode": "list",
+          "cachedResultName": "models/gemini-3.1-flash-lite"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a world-class mentor who can teach ANY skill, technical or non-technical. Create a personalised skill mastery roadmap as a beautiful HTML email.\n\nPerson:\n- Name: {{ $json['Your Name'] }}\n- Skill: {{ $json['Which skill do you want to master?'] }}\n- Where are you and how much time can you dedicate ? (daily hours): {{ $json['Where are you and how much time can you dedicate ?'] }}\n\nFirst decide these numbers, then use them in the email:\n1. currentLevelPercent: how far along they already are. \"Just starting\" = 5% to 10%, \"Some basics\" = 20% to 30%. Write as a percent string like 25%.\n2. weeksToJob: realistic weeks of consistent effort at their pace until they can do basic paid work.\n3. Monthly income in Indian Rupees at three stages: incomeBeginner, incomeIntermediate, incomePro as short realistic ranges like Rs 15k to 30k. Bar widths: incBarPro = 100%, incBarBeginner and incBarIntermediate proportional to their income (like 20% and 55%).\n\nRULES:\n- Every value is real content. No brackets, no placeholders, no lorem text in the output.\n- Keep each fill short: 1 to 2 lines max. Real tools, real drills, real resources, real numbers. No vague filler.\n- Equal depth for any skill: a cooking blueprint should be as rich as a coding one.\n- Warm and motivating, but honest about the real effort. Income figures are rough ranges, never promises.\n\nNow write the complete Gmail-ready HTML email body yourself.\n\nSECTIONS, in this exact order:\n1. Header band: small eyebrow SKILL MASTERY BLUEPRINT, then the title Master <skill>, then two rounded pills reading For <name> and Starting: <level>.\n2. Opening: 2 sentences on what mastering this skill really means for them plus an honest view of the journey from their level.\n3. Progress bar showing currentLevelPercent with the percent label inside the filled part, then a tinted callout line: Time to first paid work: roughly <weeksToJob> weeks at your chosen pace.\n4. Table, 4-stage mastery path: Beginner, Intermediate, Advanced, Master. Each row says what they learn and what they can do by the end.\n5. Table, 30-day kickstart: Week 1 to Week 4. Each row is one concrete focus plus one practice goal.\n6. Learn from the best panel: Watch, Read, Practice with, Join. One specific named resource line each.\n7. Earning potential: 3 rows (Beginner, Intermediate, Pro / Expert), each with a horizontal bar at its incBar width and the income range right-aligned.\n8. Start today block: 3 numbered actions. First one doable in the next hour, other two this week.\n9. One short warm closing line addressed to them by name, italic, centred.\n10. Footer line: Skill Mastery Blueprint. Powered by Gemini AI and n8n.\n\nDESIGN TOKENS:\n- Primary #6C5CE7, light accent #a29bfe, tint panel #F8F7FF, body text #2d3436, muted #888888, border #eeeeee, card #ffffff, footer #FAFAFA.\n- Font stack: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif.\n- Container max-width 600px, centred, 12px rounded corners, header band uses a linear-gradient from #6C5CE7 to #a29bfe with #6C5CE7 as the background-color fallback.\n- Section headings 14px uppercase in primary with letter-spacing. Body 13 to 15px. Table cells 12px. Alternate table rows #F8F7FF and #ffffff.\n\nHTML CONSTRAINTS, Gmail safe:\n- Every style is an inline style attribute. No style block, no classes, no external or web fonts.\n- No html, head or body tags. Start at one wrapper div and end with its closing tag.\n- All layout with tables. No flexbox, no grid, no position, no float, no media queries.\n- Bars are a grey wrapper div with a coloured inner div whose width is a percent.\n- No images, no scripts, no comments, no link tracking. Emoji only as plain text characters.\n- Output ONLY raw HTML. First character < and last character >. No markdown, no code fences, no commentary before or after."
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.2,
+      "position": [
+        -64,
+        0
+      ],
+      "id": "178c2b33-69e2-4719-89f2-82c5cf6a2c5a",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "cuD2FpmrPOmCQO9t",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('On form submission').item.json['Your Email'] }}",
+        "subject": "={{ $('On form submission').item.json['Your Name'] }}, your Skill Mastery Blueprint is ready 🎯",
+        "message": "={{ $json.content.parts[0].text.replace(/```html/g, '').replace(/```/g, '').replace(/^[\\s\\S]*?(?=<)/, '').replace(/[^>]*$/, '') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        304,
+        0
+      ],
+      "id": "67c18a8f-2da7-494b-8298-957449d16892",
+      "name": "Send a message",
+      "webhookId": "1907ae79-0dcc-4232-8249-1fbc4c20a8d1",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "lcnfokokfwKxN7kR",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "704f4730-ef5e-4e45-808c-bc551594e3b7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e13784ee520693ea8f32b68aeffed983c02e5e79c59d951fda61b97fe3c2cac8"
+  },
+  "nodeGroups": [],
+  "id": "JPlD0fm7JFWaYeQc",
+  "tags": []
+}
