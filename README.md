@@ -1,4 +1,4 @@
-# Mentora
+# Mentor Flow
 
 A simple AI mentor automation built using n8n, Gemini and Gmail.
 
